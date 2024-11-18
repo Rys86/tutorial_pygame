@@ -1,39 +1,45 @@
 import pygame, sys
+from rocket import Rocket
 
-max_tps = 70.0
-pygame.init()
-res = (1280,720)
-screen =  pygame.display.set_mode(res)
-box = pygame.Rect(10,10,50,50)
-# x = 10
-clock = pygame.time.Clock()
-delta = 0.0
+class Game(object):
+    def __init__(self):
+        # Config
+        self.max_tps = 100.0
 
-while True:
-    # Handle Events
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit(0)
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            sys.exit(0)
-            # box.x += 100
-    # Ticking
-    delta += clock.tick()/1000.0
-    while delta > 1/max_tps:
-        delta -= 1/max_tps
+        # Initialization
+        pygame.init()
+        self.screen =  pygame.display.set_mode((1280,720))
+        self.tps_clock = pygame.time.Clock()
+        self.tps_delta = 0.0
 
-        # Checking Input
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_d]:
-            box.x += 1
-        if keys[pygame.K_a]:
-            box.x -= 1
-        if keys[pygame.K_w]:
-            box.y -= 1
-        if keys[pygame.K_s]:
-            box.y += 1
+        self.player = Rocket(self)
 
-    # Drawing
-    screen.fill((0,0,0))
-    pygame.draw.rect(screen, (0,150,255), box )
-    pygame.display.flip()
+        while True:
+            # Handle Events
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    sys.exit(0)
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    sys.exit(0)
+
+            # Ticking
+            self.tps_delta += self.tps_clock.tick() / 1000.0
+            while self.tps_delta > 1 / self.max_tps:
+                self.tick()
+                self.tps_delta -= 1 / self.max_tps
+
+            # drawing
+            self.screen.fill((0, 0, 0))
+            self.draw()
+            pygame.display.flip()
+
+    def tick(self):
+        self.player.tick()
+
+
+    def draw(self):
+        self.player.draw()
+
+
+if __name__ == "__main__":
+    Game()
